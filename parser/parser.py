@@ -12,9 +12,7 @@ from common.parser import get_all_links
 
 class Parser:
 
-    DISPATCHER_ENDPOINTS = ['http://127.0.0.1:5001']
-
-    def __init__(self, host, port):
+    def __init__(self, host, port, dispatcher_endpoints):
 
         self.host = host
         self.port = port
@@ -22,6 +20,7 @@ class Parser:
         self.loop = asyncio.get_event_loop()
         self.urls_to_dispatcher = deque([])
         self.urls_already_discovered = set()
+        self.dispatcher_endpoints = dispatcher_endpoints
         self.semaphore = BoundedSemaphore(value=1)
 
     def parser_callback(self, urls):
@@ -45,7 +44,7 @@ class Parser:
             if self.urls_to_dispatcher:
                 url = self.urls_to_dispatcher.popleft()
                 print('Sending URL to dispatcher')
-                selected_host = choice(self.DISPATCHER_ENDPOINTS)
+                selected_host = choice(self.dispatcher_endpoints)
                 data_to_post = {'urls': [{'url': url}]}
                 res = await post_request(selected_host, data_to_post)
             else:
@@ -71,5 +70,5 @@ class Parser:
         web.run_app(app, host=self.host, port=self.port)
 
 if __name__ == '__main__':
-    p = Parser('127.0.0.1', 5003)
+    p = Parser('127.0.0.1', 5003, dispatcher_endpoints=['http://127.0.0.1:5001/'])
     p.run_app()

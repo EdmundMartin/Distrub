@@ -8,15 +8,14 @@ from common.request import post_request
 
 class Dispatcher:
 
-    SCRAPER_HOSTS = ['http://127.0.0.1:5002']
-
-    def __init__(self, host, port):
+    def __init__(self, host, port, scraper_hosts):
 
         self.host = host
         self.port = port
         self.urls_to_dispatch = deque([])
         self.urls_crawled = set()
         self.loop = asyncio.get_event_loop()
+        self.scraper_hosts = scraper_hosts
 
     async def dispatch_queue(self, request):
         data = await request.json()
@@ -34,7 +33,7 @@ class Dispatcher:
                 print(self.urls_to_dispatch)
                 url_item = url_data.get('url')
                 self.urls_crawled.add(url_item)
-                selected_host = choice(self.SCRAPER_HOSTS)
+                selected_host = choice(self.scraper_hosts)
                 res = await post_request(selected_host, url_data)
             else:
                 await asyncio.sleep(1)
@@ -59,5 +58,5 @@ class Dispatcher:
         web.run_app(app, host=self.host, port=self.port)
 
 if __name__ == '__main__':
-    s = Dispatcher(host='127.0.0.1', port=5001)
+    s = Dispatcher(host='127.0.0.1', port=5001, scraper_hosts=['http://127.0.0.1:5002/'])
     s.run_app()
