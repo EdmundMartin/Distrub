@@ -13,7 +13,7 @@ async def post_request(url, json, proxy=None):
 
 def get_request(url, proxy=None):
     try:
-        res = requests.get(url)
+        res = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'})
         return {'html': res.text, 'status': res.status_code, 'url': res.url, 'error': None, 'original_url': url}
     except requests.RequestException:
         return
